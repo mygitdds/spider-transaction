@@ -35,11 +35,11 @@ public class IsolateManager {
             return;
         }
         List<SQLUndoLog> sqlUndoLogs = connectionContext.getUndoItems();
-        isolateDataOperation(sqlUndoLogs, cp.getTargetConnection(), 0, TransactiomOperationStatus.COMMIT);
+        isolateDataOperation(sqlUndoLogs, cp.getTargetConnection(), 0, TransactionOperationStatus.COMMIT);
 
     }
 
-    public void updateDataValidStatus(List<Phase2Context> partition, UndoLogManager undoLogManager, Connection conn, TransactiomOperationStatus status) throws Exception {
+    public void updateDataValidStatus(List<Phase2Context> partition, UndoLogManager undoLogManager, Connection conn, TransactionOperationStatus status) throws Exception {
         for (Phase2Context phase2Context : partition) {
             BranchUndoLog branchUndoLog = undoLogManager.selectBranchUndoLog(phase2Context.getXid(), phase2Context.getBranchId(), conn);
             if (Objects.isNull(branchUndoLog)) {
@@ -53,7 +53,7 @@ public class IsolateManager {
     /**
      * 回滚的情况下操作
      */
-    public void rollbackDataValidStatus(UndoLogManager undoLogManager, Connection conn, TransactiomOperationStatus status, String xid, Long branchId) throws SQLException {
+    public void rollbackDataValidStatus(UndoLogManager undoLogManager, Connection conn, TransactionOperationStatus status, String xid, Long branchId) throws SQLException {
         BranchUndoLog branchUndoLog = undoLogManager.selectBranchUndoLog(xid, branchId, conn);
         if (Objects.isNull(branchUndoLog)) {
             throw new IllegalArgumentException("phase2Context.getXid():" + xid);
@@ -63,14 +63,14 @@ public class IsolateManager {
     }
 
 
-    private void isolateDataOperation(List<SQLUndoLog> sqlUndoLogs, Connection conn, Integer status, TransactiomOperationStatus operationStatus) throws SQLException {
+    private void isolateDataOperation(List<SQLUndoLog> sqlUndoLogs, Connection conn, Integer status, TransactionOperationStatus operationStatus) throws SQLException {
         for (SQLUndoLog item : sqlUndoLogs) {
             try {
                 if (item.getSqlType().equals(SQLType.INSERT) || item.getSqlType().equals(SQLType.UPDATE)) {
                     if (conn.getAutoCommit()) {
                         conn.setAutoCommit(false);
                     }
-                    TableRecords afterTableRecords = operationStatus.equals(TransactiomOperationStatus.COMMIT) ? item.getAfterImage() : item.getBeforeImage();
+                    TableRecords afterTableRecords = operationStatus.equals(TransactionOperationStatus.COMMIT) ? item.getAfterImage() : item.getBeforeImage();
                     List<List<Row>> rows = Lists.partition(afterTableRecords.getRows(), 500);
                     for (List<Row> rows1 : rows) {
                         afterTableRecords.getRows();

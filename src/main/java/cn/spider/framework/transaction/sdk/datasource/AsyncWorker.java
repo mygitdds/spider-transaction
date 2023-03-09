@@ -17,7 +17,7 @@ package cn.spider.framework.transaction.sdk.datasource;
 
 import cn.spider.framework.transaction.sdk.core.model.BranchStatus;
 import cn.spider.framework.transaction.sdk.datasource.isolate.IsolateManager;
-import cn.spider.framework.transaction.sdk.datasource.isolate.TransactiomOperationStatus;
+import cn.spider.framework.transaction.sdk.datasource.isolate.TransactionOperationStatus;
 import cn.spider.framework.transaction.sdk.datasource.undo.UndoLogManager;
 import cn.spider.framework.transaction.sdk.datasource.undo.UndoLogManagerFactory;
 import cn.spider.framework.transaction.sdk.thread.NamedThreadFactory;
@@ -137,7 +137,7 @@ public class AsyncWorker {
             for (List<Phase2Context> partition : splitByLimit) {
                 // 修改操作数据状态
                 try {
-                    isolateManager.updateDataValidStatus(partition, undoLogManager, conn, TransactiomOperationStatus.COMMIT);
+                    isolateManager.updateDataValidStatus(partition, undoLogManager, conn, TransactionOperationStatus.COMMIT);
                     deleteUndoLog(conn, undoLogManager, partition);
                 } catch (Exception e) {
                     e.printStackTrace();

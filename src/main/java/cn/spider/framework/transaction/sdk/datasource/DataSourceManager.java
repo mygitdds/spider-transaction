@@ -23,7 +23,7 @@ import cn.spider.framework.transaction.sdk.core.model.BranchStatus;
 import cn.spider.framework.transaction.sdk.core.model.BranchType;
 import cn.spider.framework.transaction.sdk.core.model.Resource;
 import cn.spider.framework.transaction.sdk.datasource.isolate.IsolateManager;
-import cn.spider.framework.transaction.sdk.datasource.isolate.TransactiomOperationStatus;
+import cn.spider.framework.transaction.sdk.datasource.isolate.TransactionOperationStatus;
 import cn.spider.framework.transaction.sdk.datasource.undo.UndoLogManager;
 import cn.spider.framework.transaction.sdk.datasource.undo.UndoLogManagerFactory;
 import org.slf4j.Logger;
@@ -108,7 +108,7 @@ public class DataSourceManager extends AbstractResourceManager {
             // 执行回退
             Connection conn = dataSourceProxy.getPlainConnection();
             UndoLogManager undoLogManager = UndoLogManagerFactory.getUndoLogManager(dataSourceProxy.getDbType());
-            isolateManager.rollbackDataValidStatus(undoLogManager,conn, TransactiomOperationStatus.ROLL_BACK,xid,branchId);
+            isolateManager.rollbackDataValidStatus(undoLogManager,conn, TransactionOperationStatus.ROLL_BACK,xid,branchId);
             UndoLogManagerFactory.getUndoLogManager(dataSourceProxy.getDbType()).undo(dataSourceProxy, xid, branchId,conn);
         } catch (TransactionException | SQLException te) {
             return BranchStatus.PhaseTwo_RollbackFailed_Retryable;
